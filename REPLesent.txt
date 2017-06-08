@@ -1,266 +1,310 @@
-| \gWelcome to REPLesent!
+| \*Cheaper than \gFree\s
 
-REPLesent is a neat little tool to build presentations
-using the Scala REPL.
+Today we're going to talk about how to get
+referential transparency on the cheap.
 
-It is a good option for training sessions and talks
-with some live coding. More on that later.
+First, let's remind ourselves of what
+"referential transparency" is.
+From the Red Book:
 
-To continue, type the letter '\bn\s' (no quotes) and \bRETURN\s.
+"An expression \ge\s is \rreferentially\s
+\rtransparent\s if for all programs \gp\s,
+every occurrence of \ge\s in \gp\s can be
+replaced with the result of evaluating \ge\s
+without changing the result of evaluating \gp\s."
+
+"A function \gf\s is \rpure\s if the expression
+\gf(x)\s is referentially transparent for all
+referentially transparent \gx\s."
 ---
-You use '\bn\s' to advance to the next slide.
+| \*Why do we care?\s
 
-Let's try it, type '\bn\s' again to see it.
+One of our professional responsibilities is to
+understand our code. (Besides, who \_doesn't\s
+want to understand their code?) Referential
+transparency lets us use a particularly simple
+approach to understanding, called the
+\r"substitution model of evaluation."\s
 ---
-To go back to a previous slide, you can type '\bp\s'.
+| \*The Substitution Model of Evaluation\s
 
-Try '\bp\s' now to return to the prior slide and
-then use '\bn\s' twice to go to the next slide.
-
-But please be careful to not read and
-follow these instructions again.
-
-You would not want to get stuck in a
-infinite loop between two slides forever.
----
-Nice, I am glad you made your way to this slide.
-
-But you know, all that "use '\bn\s' twice" business was a lot of effort.
-
-There should be a better way to advance two slides at once.
-
-And, as a matter of fact, there is!
-
-You should try '\b2 n\s'. Go ahead, enter '\b2 n\s' and see what happens!
----
-Holy cow, that was awesome!
-
-OK, let's try something new again.
-
-This time I want you to enter '\bl\s' (ell).
-
-I'm not telling what it does.
----
-OK, you have just skipped a slide.
-
-Aren't you curious to know what that slide had to say?
-
-You already know that you could use '\bp\s' to go back,
-but let's try something different now.
-
-The slide you missed was slide number 5.
-
-To jump to slide 5, just use the command '\b5 go\s'. Go!
----
-| \gBasics
-
-Creating presentations is very easy.
-
-All you need is a plain text file. Anything you write in the file is
-displayed on the screen, centered vertically and horizontally.
-
-To separate slides, just put three dashes (\r---\s) on a line by themselves.
-
-It is also possible to create "builds", where a slide is
-displayed incrementally, step by step.
-
-Think bullet points in Powerpoint.
-
-Advance to the next slide to learn more about builds.
----
-| \gBuilds (Incremental Slides)
-
-Builds are separated by two dashes (\r--\s) on a line by themselves.
-
-Type '\bn\s' a few times to see how it works.
---
-
-\*Phase 1\s: Collect underpants
---
-
-\*Phase 2\s: ?
---
-
-\*Phase 3\s: Profit
----
-| \gText Alignment
-
-Text can be aligned with ease. Just start a line with one of the
-following commands. The space after the command is mandatory.
-
-<< '\r<< \s' flushes the line to the left of the screen.
-
-< '\r< \s' aligns the line to the left of the slide (default).
-
-| '\r| \s' centers the line.
-
-> '\r> \s' aligns the line to the right of the slide.
-
->> '\r>> \s' flushes the line to the right of the screen.
-
-Whitespace other than the one following the alignment command
-is preserved. You can easily align manually if needed.
----
-| \gANSI Color Support
-
-\rOh \gmy \bgosh, \cit's \mfull \yof \scolors\r!\g!\b!\c!\m!\y!\w!\k!
-
-ANSI color escape codes:
-\\r \rred\s   \\g \ggreen\s    \\b \bblue\s    \\k \kblack
-\\c \ccyan\s  \\m \mmagenta\s  \\y \yyellow\s  \\w \wwhite
-
-\\* is for \*bold\s. You can combine it with colors, too:
-   \*\rred\s      \*\ggreen\s       \*\bblue\s       \*\kblack
-   \*\ccyan\s     \*\mmagenta\s     \*\yyellow\s     \*\wwhite
-
-Capital letters set background color:
-\\R \Rred\s   \\G \Ggreen\s    \\B \Bblue\s    \\K \Kblack
-\\C \Ccyan\s  \\M \Mmagenta\s  \\Y \Yyellow\s  \\W \Wwhite
-
-Use \\_ for \_underline\s and \\! for \!reverse\s.
-\\s resets everything back to normal, whatever your normal is.
-Use double slashes (\\\\) to escape slashes.
-Anything else, like \z, is unaffected.
----
-| \gHorizontal Rulers
-
-You can start a line with a forward slash '\r/\s' to
-create a horizontal line across your slide:
-
-/
-
-Double slashes '\r//\s' create a line across the entire screen:
-
-//
-
-You can also specify custom patterns, as in '\r/=+\s':
-
-/=+
-
-You can use Unicode and ANSI colors, too. Be creative!
-
-/\r=\s\**\s\r=\b=\s\**\s\b=
-
-/ ⚡ ☁
-
----
-| \gSyntax Highlighting
-
-Basic support for syntax highlighting is also provided.
-
-Just surround your Scala code with the \r```\s delimiter.
-
-< ```
-< val a = 42
-< ```
-
-becomes
+Let's start with the simplest kind of example:
 
 ```
-val a = 42
+val twelve = 7 + 5
+val fortyFive = 9 * 5
+```
+
+Even without the names, you'd have no trouble
+figuring out what these values are. You learned
+them when you were 10 or 11. You can \gsubstitute\s
+12 or 45 for 7 + 5 or 9 * 5 anytime, anywhere.
+---
+| \*Expressions\s
+
+It's probably worth pointing out that 7 + 5 and
+9 * 5 are \rexpressions\s. They \rreduce\s to some
+more simple form. Again, you probably don't even
+think about this, or need to, for arithetic, but 
+let's keep it in mind for later. More generally,
+everything but \gimport\s is an expression that
+evaluates to a \gresult\s.
+
+Now let's dig a little deeper into expressions and
+referential transparency.
+---
+| \*Methods\s
+
+Let's generalize a bit:
+
+```
+def add5(i: Int): Int = i + 5
+def multiplyBy5(i: Int): Int = i * 5
+```
+
+No matter what value \gi\s has, we can use the same
+approach to understanding this code as before. Now
+let's do both:
+
+```
+def add5AndThenMultiplyBy5(i: Int): Int = multiplyBy5(add5(i))
+
+add5AndThenMultiplyBy5(7)
+```
+
+Still pretty easy to understand.
+\rQuestion:\s Can we approach this another way?
+---
+| \*Refactoring\s
+
+How about:
+
+```
+val add5AndThenMultiplyBy5: Int => Int = add5 _ andThen multiplyBy5 _
+
+add5AndThenMultiplyBy5(7)
+```
+
+This is notably different: the code says what it does as clearly
+as its name does. Its type makes clear that it transforms an
+\gInt\s to an \gInt\s. But it looks like we're transforming two
+functions to another function. And so we are. \gandThen\s is a
+\rcombinator\s. A combinator is a function that takes functions as
+arguments and returns a function as a result. That is, it \rcombines\s
+functions. Note that we have to use "η-expansion" (sorry, but it's
+standard λ calculus terminology) to turn a method made with \gdef\s into
+a function, since \gandThen\s is available on functions, not methods.
+---
+| \*Programs as Values\s
+
+Another thing that's different about
+
+```
+val add5AndThenMultiplyBy5: Int => Int = add5 _ andThen multiplyBy5 _
+```
+
+is that it's a \gval\s. First-class functions are perfectly good values,
+and because combinators transform function values to other function values,
+functional programming, ironically, might be called \_consistently value-\s
+\_oriented programming\s instead. Note that there's no mention of arguments in
+this version of \gadd5AndThenMultiplyBy5\s. We're not actually "doing a
+computation." We're \_describing\s a computation that will be done later,
+when we provide an \gInt\s. More importantly, we can reason about this
+version more easily: we understand \gadd5\s by itself by the substitution
+model; we understand \gmultiplyBy5\s by itself by the substitution model;
+we understand \gadd5AndThenMultiplyBy5\s by the substitution model. We
+can reason about the previous version the same way; it's just that, with
+a bit of experience, this version becomes easier to read (it echoes the
+name!) and is more general: \gandThen\s doesn't care about the functions'
+arguments or their types. It only cares that the type of the result of the
+first function is the same as the type of the argument of the second.
+---
+| \* Referential Opacity\s
+
+By contrast, consider:
+
+```
+val hi: Unit = println("Hello, world!")
+```
+
+The fact that \ghi\s has type \gUnit\s rather than \gString\s gives the
+game away, but we can run the code to prove the point: if our \_intent\s
+is to put "Hello, world!" out to the world, well, that happens... once,
+and \_it happens when we define the \gval\s. What happens when we use the
+\gval\s in the rest of the program? Nothing (\gUnit\s). This is why it's
+called a \_side\s-effect: we get a value (of type \gUnit\s) and, as a
+side-effect, something is printed to the console. So we need some means of
+representing effects as values, too. It turns out, in scalaz, there's a
+very flexible way to do that: \gTask\s.
+---
+| \*\gTask\s \*Master\s
+
+Let's get this out of the way: \gTask\s is a \gMonad\s. A big one. You can
+construct one with a pure value or an expression, including an expression
+that can \gthrow\s.
+
+```
+import scalaz.concurrent.Task
+
+val fortyTwo = Task.now(42)
+val hi = Task.delay(println("Hello, world!"))
+```
+
+The default constructor behaves like \gTask.delay\s, but when the \gTask\s
+runs, it will run on a thread taken from the provided \gExecutorService\s,
+or \gscalaz.concurrent.Strategy.DefaultExecutorService\s if none is provided.
+
+```
+val newHi = Task(println("Hello, world!"))
+```
+
+Can we do stuff like we did with functions-as-values now? Yes, we can!
+
+```
+import scalaz.syntax.monad._
+
+val meet = Task.delay {
+  print("What is your name? ")
+  readLine
+}
+
+val greet = (n: String) => Task.delay(println(s"Hi there, $n!"))
+
+val meetAndGreet = meet >>= greet
+```
+
+\g>>=\s is another name for \gflatMap\s, so:
+
+```
+val fmg = meet flatMap greet
+```
+
+or
+
+```
+val cmg = for {
+  n <- meet
+  _ <- greet(n)
+} yield ()
 ```
 ---
+| \*Run, run, run, run... (h/t Pink Floyd)\s
+
+OK, so we can build up these values that somehow
+capture effects both in ways that are familar,
+like \gflatMap\s and \gfor-comprehensions\s, and
+less familiar ways, like \g>>=\s. How do we \_run\s
+one of these values?
+
 ```
-import scala.util._
+meetAndGreet.unsafePerformSync
+```
 
-var i = 0
-lazy val avogadro = 6.02e23
+Both "unsafe" and "sync" should be taken seriously:
+Unsafe, because we sacrifice referential transparency
+at this point; \gSync\s, because this will block the current thread
+until the result is available.
 
-def f(i: Int) = i + 1
+Ultimately, we're shooting for a referentially transparent
+application, so we shouldn't run \gTask\ss. We should let
+"the runtime" do that, by making our app extend \gTaskApp\s.
 
-sealed trait A
-private object B extends A
-protected case class Person(name: String)
+```
+import scalaz.concurrent.TaskApp
 
-try { 1 / 0 } catch { case e: Exception => 0 }
-
-if (this == null) true else false
-
-for (i <- 1 to 10) yield i * i
-
-a match {
-  case 1 => "one"
-  case _ => "not"
+object App extends TaskApp {
+  override def runc = meetAndGreet
 }
 ```
+
+http4s services should similarly use \gServerApp\s to construct and
+bind the HTTP server. Routes can construct \gResponse\ss from \gTask\ss
+with no fuss, e.g. \gOk(Task.now(Foo("Paul").asJson))\s. If you're using
+Doobie for database access, this is especially nice; it's reasonable to
+say, e.g. \gOk(myQuery.list.transact(xa).map(_.asJson))\s to return the
+results of \gmyQuery\s, assuming \gxa\s is a \gTransactor[Task]\s.
 ---
-| \gRunning Code
+| \*All Together Now!\s
 
-Now, what I personally consider to be the second coolest feature of all:
-
-| \*Running Scala code straight from your slides!
-
-Let's start with some sample code:
+I haven't talked much about concurrency with \gTask\s, even though it's in
+the \gscalaz.concurrent\s package and I mentioned that you can construct
+\gTask\ss that run on separate threads. Thankfully, it's easy to do things
+with multiple \gTask\s:
 
 ```
-val a = 2
-val b = 3
-a * b
+import scalaz.Nondeterminism
+
+val one   = Task { println("1"); 1 }
+val two   = Task { println("2"); 2 }
+val three = Task { println("3"); 3 }
+val all   = List(one, two, three)
+
+val u = Nondeterminism[Task].gatherUnordered(all)
+val o = Nondeterminism[Task].gather(all)
 ```
 
-Now, enter '\b!!\s' or '\br\s' and see the Scala REPL execute the code
-above as if you had typed it yourself directly in the prompt.
+Keep in mind that \gNondeterminism\s only \_starts\s
+\gTask\ss nondeterministically, so if you construct
+your \gTask\ss with \gnow\s or \gdelay\s, you'll get
+deterministic behavior, because each \gTask\s will run
+to completion on the current thread. In other words,
+\gNondeterminism\s can't change a \gTask\s's concurrency
+\gStrategy\s.
 ---
-That was pretty cool, eh? But it gets better.
+| \*Why do mathematicians have such weird names?\s
 
-Remember we defined vals \ba\s and \bb\s in the previous slide?
-
-Any slide can now refer to those variables.
-They are still in scope. Try it if you don't believe me:
-
-```
-val c = a + b
-```
---
-
-You can put multiple pieces of code in the same slide, separated
-by builds or not. They all get executed properly.
---
-
-Let's try it. First, define a new value:
+In the beginning, I talked about functions and \gandThen\s.
+Monads like \gTask\s muddy the waters a little, because a
+\gTask\s itself isn't a function. But what about
 
 ```
-val last = a + b + c
+val greet = (n: String) => Task.delay(println(s"Hi there, $n!"))
 ```
 
-And then use it:
+It's a function. It's referentially transparent. But we can only
+use \gflatMap\s on the \gTask\s itself, and there's no \gandThen\s.
+
+Or is there?
 
 ```
-for (i <- 1 to last) yield i * i
+import scalaz.Kleisli
+import scalaz.syntax.kleisli._
+
+val meetK  = meet.liftKleisli[Unit]      // If we have a M[B], specify A (Unit)
+val greetK = Kleisli(greet)              // If we have an A => M[B], here a String => Task[Unit]
+
+val mgK = meetK andThen greetK
 ```
+
+Kleisli composition is to \gMonad\sic functions as function
+composition is to functions.
 ---
-Of course, I saved the best for last:
---
+| \*Kleisli as Reader Monad\s
 
-| \gEmoji support!
---
+On one hand, \gKleisli\s is just another representation of
+A => M[B]. On the other, it turns out a \gKleisli\s is
+whatever its M is. That is, because \gTask\s is a \gMonad\s,
+so is \gKleisli[Task, ?, ?]\s, so it can be used in contexts
+supporting \gMonad\ss, just as \gTask\ss can. More broadly,
+\gKleisli\s is helpful for supporting functions that need some
+context in order to construct a \gMonad\sic result. For example:
 
-I mean,
+```
+type Config(xa: Transactor[Task], ...)
+type ApplicationK[B] = Kleisli[Task, Config, B]
 
-| \gEmoji support:bangbang:
---
+def lookupUser(id: String): ApplicationK[Option[User]] = Kleisli { cfg =>
+  sql"...".query[User].option.transact(cfg.xa)
+}
+```
 
-The most commonly used shortcuts are supported: \bemoji-cheat-sheet.com\s
---
-
-And you can even use them as horizontal rulers:
-
-/ :walking:
-
-// :banana:
-
-/ :+1: :-1:
-
-// :two_men_holding_hands: :two_women_holding_hands:
-
----
-Oh, noes! This is the last slide.
-
-And here ends our adventure.
-
-But I will leave you with one last command to try: '\bh\s'.
-
-Good luck with that!
-
-Now go back to slide 7 ('\b7 go\s') to learn
-how to create your own presentations!
+To actually perform a Doobie query and get a \gTask\s, you need a
+\gTransactor\s. But a \gTransactor\s is a good example of the kind
+of "global resource" that should be acquired at app startup and kept
+in the app's config. Our persistence code needs access to it at some
+point, but it would be awkward or impossible (in some contexts) to
+pass it to the relevant function. Instead, we can return the Kleisli,
+which we can do anything with that we can do with any \gMonad\s, and
+pass the \gConfig\s in only when we actually must have the \gTask\s,
+e.g. in the app where loading the config meets serving the business
+logic.
